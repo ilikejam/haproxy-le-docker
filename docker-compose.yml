@@ -25,7 +25,7 @@ letsencrypt:
       - /var/run/docker.sock:/var/run/docker.sock:rw,Z
     networks:
       - haproxy
-    command: bash -c 'sleep 10; while true; do certbot renew --deploy-hook /deploy-hook; sleep 86400; done'
+    command: bash -c 'sleep 10; while true; do certbot renew --standalone --http-01-port 8000 --deploy-hook /deploy-hook; sleep 86400; done'
     privileged: true
     
 volumes:
