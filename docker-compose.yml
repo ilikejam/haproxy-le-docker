@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  haproxy:
+    container_name: haproxy
+    image: haproxy:latest
+    restart: always
+    volumes:
+      - ./haproxy/bind:/usr/local/etc/haproxy:ro,Z
+      - letsencrypt_etc:/etc/letsencrypt
+    networks:
+      - haproxy
+    ports:
+      - 80:8080
+      - 443:8443
+    user: '1001'
+        
+letsencrypt:
+    build: ./letsencrypt
+    image: letsencrypt
+    container_name: letsencrypt
+    restart: always
+    volumes:
+      - letsencrypt_etc:/etc/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:rw,Z
+    networks:
+      - haproxy
+    command: bash -c 'sleep 10; while true; do certbot renew --deploy-hook /deploy-hook; sleep 86400; done'
+    privileged: true
+    
+volumes:
+  letsencrypt_etc:
+    
+networks:
+  haproxy:
+
